@@ -31,6 +31,7 @@
     "@server": "src/server.js",
     "@app": "src/app.js",
     "@config": "src/config/index.js",
-    "@products": "src/features/products"
+    "@products": "src/features/products",
+    "@purchases": "src/features/purchase"
   }
 }
