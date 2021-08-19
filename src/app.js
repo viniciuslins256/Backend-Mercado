@@ -1,5 +1,6 @@
 const express = require('express');
 const productsRoutes = require('./routes/Products.routes');
+const purchasesRoutes = require('./routes/Purchases.routes');
 const app = express();
 const cors = require('cors');
 const { json, urlencoded } = require('body-parser');
@@ -14,6 +15,6 @@ app.use(cookieParser());
 app.use(urlencoded({ extended: false }));
 app.use(json());
 app.use(morgan('short'));
-app.use('/', productsRoutes);
+app.use('/', productsRoutes, purchasesRoutes);
 
 module.exports = app;

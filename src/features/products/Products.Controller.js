@@ -1,8 +1,14 @@
+const Product = require('@products/Product');
+const { handleFields } = require('./UtilProduct');
+
 module.exports = {
 
     async index(req, res){
         try{
-            return res.status(200).send({"Products": "Tudo ok com o método index de products!"})
+            const products = await Product.findAll();
+            
+            if(products.length != 0) return res.status(200).send({"Products": products});
+            return res.status(400).send({"message": "There are no registered products!"});
         }catch(error){
             return res.status(400).send(error.message)
         }
@@ -10,7 +16,17 @@ module.exports = {
 
     async show(req, res){
         try{
-            return res.status(200).send({"Products": "Tudo ok com o método show de products!"})
+            const { id } = req.params;
+
+            const product = await Product.findAll({
+                where: {
+                    id: id
+                }
+             });
+
+            if(product.length != 0) return res.status(200).send({"Product": product});
+            return res.status(400).send({"message": "Product not found!"});
+
         }catch(error){
             return res.status(400).send(error.message)
         }
@@ -18,7 +34,13 @@ module.exports = {
 
     async save(req, res){
         try{
-            return res.status(200).send({"Products": "Tudo ok com o método save de products!"})
+            const { name, cost_price, sale_price, amount } = req.body;
+
+            const product = await Product.create({ name, cost_price, sale_price, amount });
+            
+            if(product) return res.status(201).send({"Product": product});
+            return res.status(400).send({"message": "Error in product creation"});
+
         }catch(error){
             return res.status(400).send(error.message)
         }
@@ -26,7 +48,18 @@ module.exports = {
 
     async update(req, res){
         try{
-            return res.status(200).send({"Products": "Tudo ok com o método update de products!"})
+            const datas = handleFields(req.body);
+            const { id } = req.params;
+
+            const product = await Product.update( datas, {
+                where: {
+                    id: id
+                }
+            });
+
+            if(product) return res.status(200).send({"Product updated": id});
+            return res.status(400).send({"message": "Error in product updated"});
+
         }catch(error){
             return res.status(400).send(error.message)
         }
@@ -34,7 +67,17 @@ module.exports = {
 
     async remove(req, res){
         try{
-            return res.status(200).send({"Products": "Tudo ok com o método delete de products!"})
+            const { id } = req.params;
+            
+            const product = await Product.destroy({
+                where: {
+                    id: id
+                }
+            });
+
+            if(product == 1) return res.status(200).send({ "Product deleted": id });
+            return res.status(400).send({ "message": "Product not found!"});
+
         }catch(error){
             return res.status(400).send(error.message)
         }

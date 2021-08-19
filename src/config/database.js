@@ -1,9 +1,8 @@
 module.exports = {
     dialect: 'postgres',
-    host: 'localhost',
-    username: 'postgres',
-    password: '1234',
-    database: 'solvum',
+    host: 'ruby.db.elephantsql.com',
+    username: 'okruhjik',
+    password: '7XwT4UFODTDnDRLvNa08HaBlC69yS6UA',
     define: {
         timestamps: true,
         underscored: true
