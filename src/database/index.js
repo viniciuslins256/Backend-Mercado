@@ -2,7 +2,7 @@ const Sequelize = require('sequelize');
 const dbConfig = require('../config/database');
 
 const Product = require('@products/Product');
-const Purchase = require('@purchase/Purchase');
+const Purchase = require('@purchases/Purchase');
 
 const connection = new Sequelize(dbConfig);
 

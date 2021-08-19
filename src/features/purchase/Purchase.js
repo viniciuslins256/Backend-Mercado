@@ -12,8 +12,8 @@ class Purchase extends Model {
     }
 
     static associate(models) { 
-        this.belongsToMany(models.Products, { foreignKey: 'purchase_id', through: 'purchase_products', as: 'products'});
+        this.belongsToMany(models.Product, { foreignKey: 'purchase_id', through: 'purchase_products', as: 'products'});
     }
 }
 
-module.exports = Product;
+module.exports = Purchase;
