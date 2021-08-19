@@ -13,7 +13,6 @@ app.use(cors())
 app.use(cookieParser());
 app.use(urlencoded({ extended: false }));
 app.use(json());
-app.use(morgan('short'));
 app.use('/', productsRoutes, purchasesRoutes);
 
 module.exports = app;
