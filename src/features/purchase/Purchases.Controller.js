@@ -130,15 +130,36 @@ module.exports = {
     async remove(req, res){
         try{
             const { id } = req.params;
-            
-            const product = await Product.destroy({
-                where: {
-                    id: id
-                }
-            });
 
-            if(product == 1) return res.status(200).send({ "Product deleted": id });
-            return res.status(400).send({ "message": "Product not found!"});
+            const purchase = await Purchase.findByPk( id );
+        
+            if(purchase != null) {
+                var products = await Purchase_product.findAll({
+                    where: { purchase_id: id},
+                });
+                
+                for(var i=0; i < products.length; i++) {
+                    var product = await Products.findByPk( products[i].dataValues.product_id );
+                    var sum = product.dataValues.amount+products[i].dataValues.amount;
+                    await Products.update( { amount: sum }, { 
+                        where: { 
+                            id: products[i].dataValues.product_id
+                        }
+                    });
+                }
+
+                await Purchase_product.destroy({
+                    where: { purchase_id: id},
+                });
+
+                await Purchase.destroy({
+                    where: { id: id},
+                });
+
+                return res.status(200).send({"Purchase Deleted": `purchase ${id} was deleted with sucess`});
+            }
+            
+            else return res.status(400).send({"message": "Purchase not found!"});
 
         }catch(error){
             return res.status(400).send(error.message)
