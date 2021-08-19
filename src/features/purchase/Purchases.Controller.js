@@ -40,7 +40,7 @@ module.exports = {
             }
             return res.status(400).send({"message": "There are no registered purchases!"});
         }catch(error){
-            return res.status(400).send(error.message)
+            return res.status(400).send(error.message);
         }
     },
 
@@ -67,7 +67,7 @@ module.exports = {
             return res.status(400).send({"message": "Purchase not found!"});
 
         }catch(error){
-            return res.status(400).send(error.message)
+            return res.status(400).send(error.message);
         }
     },
 
@@ -123,7 +123,7 @@ module.exports = {
             return res.status(400).send({"message": "Error in purchase creation"});
 
         }catch(error){
-            return res.status(400).send(error.message)
+            return res.status(400).send(error.message);
         }
     },
 
@@ -162,7 +162,25 @@ module.exports = {
             else return res.status(400).send({"message": "Purchase not found!"});
 
         }catch(error){
-            return res.status(400).send(error.message)
+            return res.status(400).send(error.message);
+        }
+    },
+
+    async analytics(req,res) { 
+
+        try {
+
+            const purchases = await Purchase.findAll();
+
+            var totalSold = 0;
+            purchases.forEach( (purchase) => { 
+                totalSold += purchase.dataValues.price;
+            });
+
+            return res.status(200).send({ "totalSold": totalSold });
+        } catch(error){
+            return res.status(400).send(error.message);
         }
     }
+
 }
