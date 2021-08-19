@@ -32,6 +32,7 @@
     "@app": "src/app.js",
     "@config": "src/config/index.js",
     "@products": "src/features/products",
-    "@purchases": "src/features/purchase"
+    "@purchases": "src/features/purchase",
+    "@purchase_product": "src/features/purchase_product"
   }
 }

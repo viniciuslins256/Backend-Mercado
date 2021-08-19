@@ -12,15 +12,14 @@ module.exports = {
       purchase_id: {
         type: Sequelize.INTEGER,
         allowNull: false,
-        references: { model: 'purchases', key: 'id' },
-        onUpdate: 'CASCADE',
-        onDelete: 'CASCADE',
       },
       product_id: {
         type: Sequelize.INTEGER,
         allowNull: false,
-        references: { model: 'products', key: 'id' },
-        onUpdate: 'CASCADE',
+      },
+      amount: {
+        type: Sequelize.INTEGER,
+        allowNull: false,
       },
       created_at: {
         type: Sequelize.DATE,

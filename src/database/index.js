@@ -3,14 +3,14 @@ const dbConfig = require('../config/database');
 
 const Product = require('@products/Product');
 const Purchase = require('@purchases/Purchase');
+const Purchase_product = require('@purchase_product/Purchase_product');
 
 const connection = new Sequelize(dbConfig);
 
 Product.init(connection);
 Purchase.init(connection);
+Purchase_product.init(connection);
 
-Product.associate(connection.models);
-Purchase.associate(connection.models);
 
 console.log('\nDatabase connection successful!');
 

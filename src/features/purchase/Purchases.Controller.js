@@ -1,5 +1,7 @@
 const Purchase = require('@purchases/Purchase');
 const Products = require('@products/Product');
+const util = require('@purchase_product/UtilPurchase_product');
+const Purchase_product = require('@purchase_product/Purchase_product');
 
 module.exports = {
 
@@ -7,7 +9,35 @@ module.exports = {
         try{
             const purchases = await Purchase.findAll();
             
-            if(purchases.length != 0) return res.status(200).send({"Purchases": purchases});
+            if(purchases != null) {
+
+                var purchasesList = [];
+
+                for(var i=0; i<purchases.length; i++){
+
+                    const purchase = await Purchase.findByPk( purchases[i].dataValues.id );
+        
+                    if(purchase != null) {
+                        
+                        const productsInPurchase = await Purchase_product.findAll({
+                            where: { purchase_id: purchases[i].dataValues.id }
+                        })
+                        
+                        var listReturn = [];
+
+                        for (var j=0; j < productsInPurchase.length; j++){
+                            listReturn.push(await util(productsInPurchase[j]));
+                        }
+                        purchase.dataValues.products = listReturn;
+                        
+                        purchasesList.push(purchase);
+                    }
+                    else return res.status(400).send({"message": "Purchase not found!"});
+                }
+                
+
+                return res.status(200).send({"Purchases": purchasesList});
+            }
             return res.status(400).send({"message": "There are no registered purchases!"});
         }catch(error){
             return res.status(400).send(error.message)
@@ -18,11 +48,22 @@ module.exports = {
         try{
             const { id } = req.params;
 
-            const purchase = await Purchase.findByPk( id, {
-                include: { association: 'products' }
-            });
+            const purchase = await Purchase.findByPk( id );
+        
+            if(purchase != null) {
+                
+                const productsInPurchase = await Purchase_product.findAll({
+                    where: { purchase_id: id,}
+                })
+                
+                var listReturn = [];
 
-            if(purchase.length != 0) return res.status(200).send({"Purchase": purchase});
+                for (var i=0; i < productsInPurchase.length; i++){
+                    listReturn.push(await util(productsInPurchase[i]));
+                }
+                purchase.dataValues.products = listReturn;
+                return res.status(200).send({"Purchase": purchase});
+            }
             return res.status(400).send({"message": "Purchase not found!"});
 
         }catch(error){
@@ -34,32 +75,50 @@ module.exports = {
         try{
             const { price, discount, payment_method, products } = req.body;
 
+            var productsForReturn = [] 
             products.forEach( async (product) => {
                 
-                var response = await Products.findAll({
+                var productResponse = await Products.findAll({
                     where: {
-                        id: product
+                        id: product.product_id
                     }
                  });
-                if (!response) return res.status(400).send({"message": `Product ${product} not found`});
+                
+                productResponse[0].dataValues.amount = product.amount;
+                productsForReturn.push(productResponse[0].dataValues);
+                if (!productResponse) return res.status(400).send({"message": `Product ${product.product_id} not found`});
             
             });
 
             const purchase = await Purchase.create({ price, discount, payment_method });
-            
+
             if(purchase) {
+
                 products.forEach( async (product) => {
-                    
-                    var response = await Products.findAll({
+                    var response = await Products.findOne({
                         where: {
-                            id: product
+                            id: product.product_id
+                        }
+                    });
+                    
+                    var newAmount = response.dataValues.amount - product.amount;
+                    
+                    await Products.update({ amount: newAmount }, {
+                        where: {
+                            id: product.product_id
                         }
                      });
-                    await purchase.addProducts(response);
-                
+                    
+                    await Purchase_product.create({ 
+                        purchase_id: purchase.id,
+                        product_id: product.product_id,
+                        amount: product.amount
+                    });
                 });
+
+                purchase.dataValues.products = productsForReturn;
                 
-                return res.status(201).send({"Purchase": purchase});
+                return res.status(201).send({"Purchase": purchase.dataValues});
             }
             return res.status(400).send({"message": "Error in purchase creation"});
 
