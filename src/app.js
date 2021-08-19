@@ -5,7 +5,6 @@ const app = express();
 const cors = require('cors');
 const { json, urlencoded } = require('body-parser');
 const cookieParser = require('cookie-parser');
-const morgan = require('morgan');
 
 app.use(express.json());
 
